@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Intro to MapView - Create a 2D map - 4.15</title>
+    <style type="text/css">
+        #div1
+        {
+            background-color:red;
+            padding:0;
+            margin:0;
+            height:5%;
+            width:100%;
+            float:left;
+        }
+      
+        #div3 {
+            background-color: white;
+            height: 90%;
+            width: 10%;
+            float: left;
+            
+        }
+        html,body{
+            height:100%;
+            width:100%;
+        }
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 90%;
+            width: 80%;
+            float:left;
+        }
+        #div4 {
+            background-color: white;
+            height: 90%;
+            width: 10%;
+            float: left;
+        }
+        #div5 {
+            background-color: white;
+            height: 5%;
+            width: 100%;
+            float: left;
+        }
+    </style>
+
+    <link rel="stylesheet"
+          href="https://js.arcgis.com/4.15/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.15/"></script>
+
+    <script>
+        require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/Legend", "esri/widgets/ScaleBar",
+            "esri/widgets/Search", "esri/layers/GraphicsLayer", "esri/widgets/Sketch"],
+            function (Map, MapView, featurelayer, Lenged, ScaleBar, Search, GraphicsLayer,Sketch,Track , Graphic) {
+            var graphicsLayer = new GraphicsLayer();
+            var feature = new featurelayer({
+                url: "http://www.arcgisonline.cn/server/rest/services/Hosted/%E5%85%A8%E5%9B%BD1%E6%9C%8822%E6%97%A5%E5%88%B02%E6%9C%8829%E6%97%A5%E5%90%84%E7%9C%81%E4%BB%BD%E7%96%AB%E6%83%85%E6%84%9F%E6%9F%93%E5%8F%98%E5%8C%96/FeatureServer"
+            });
+
+            var map = new Map({
+                basemap: "streets",
+                layers: [feature, graphicsLayer]
+            });
+
+            var view = new MapView({
+                container: "viewDiv",
+                map: map,
+                zoom: 5,
+                center: [120, 21] // longitude, latitude
+            });
+
+            var sketch = new Sketch({
+                    view: view,
+                    layer: graphicsLayer
+                });
+
+                view.ui.add(sketch, "top-right");
+
+             
+
+
+            var lenged = new Lenged({
+                view: view,
+                
+                layerInfos: [{
+                    layer: feature,
+                    title: "公共服务事件类型"
+                }]
+            });
+                lenged.style = "card";
+            var scalebar = new ScaleBar({
+                view: view,
+                style: "ruler",
+                unit: "metric"
+            });
+
+            view.ui.add(scalebar, "bottom-left");
+            view.ui.add(lenged, "bottom-right");
+
+
+            var coordsWidget = document.createElement("div");
+            coordsWidget.id = "coordsWidget";
+            coordsWidget.className = "esri-widget esri-component";
+            coordsWidget.style.padding = "7px 15px 5px";
+
+            view.ui.add(coordsWidget, "bottom-right");
+
+
+            var search = new Search({
+                view: view
+            });
+
+            view.ui.add(search, "top-right");
+
+            function showCoordinates(pt) {
+                var coords = "纬度 " + pt.latitude.toFixed(3) + "经度 " + pt.longitude.toFixed(3) +
+                    " | 比例 1:" + Math.round(view.scale * 1) / 1 ;
+                coordsWidget.innerHTML = coords;
+            }
+
+
+            view.watch("stationary", function (isStationary) {
+                showCoordinates(view.center);
+            });
+
+            view.on("pointer-move", function (evt) {
+                showCoordinates(view.toMap({ x: evt.x, y: evt.y }));
+            });
+
+
+
+        });
+
+
+        //<img src="http://res.northnews.cn/a/10001/202001/bd329967a8ccd7f25af28db1ad2efb3b.jpeg" height="100%" width="%" />
+
+    </script>
+</head>
+
+<body>
+    <div id="div1"  align="center"  style="color:white">全国疫情感染人数1月22日至2月19日变化</div>
+    
+    <div id="div3"  >
+        
+    </div>
+    <div id="viewDiv"></div>
+    <div id="div4"></div>
+</body>
+</html>
